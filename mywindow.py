@@ -2,7 +2,7 @@ import sys
 
 import pandas as pd
 import scanpy as sc
-from PyQt5 import QtCore, QtWidgets
+from PyQt5 import QtCore, QtWidgets, QtGui
 from PyQt5.QtCore import pyqtSignal
 from PyQt5.QtWidgets import QFileDialog, QMainWindow
 
@@ -75,8 +75,8 @@ class UiMainWindow(QMainWindow):
 
     def proceed(self):
         self.select = self.lineEdit.text()
-        self.fetched.emit()
         self.close()
+        self.fetched.emit()
 
     def selectedfile(self):
         return self.select
@@ -92,10 +92,19 @@ class Fetcher:
         self.ui.show()
 
     def dostuff(self):
-        adata = sc.read_csv(self.ui.selectedfile(), delimiter='\t')
+        adata = Back.do_prep(self.ui.selectedfile())
+        window = UiMiddleDialog()
+        window.exec()
+        # show() does not work - why???
+
+
+class Back:
+    @staticmethod
+    def do_prep(file):
+        adata = sc.read_csv(file, delimiter='\t')
         adata = adata.T
 
-        pdata = pd.read_csv(self.ui.selectedfile(), delimiter='\t')
+        # pdata = pd.read_csv(file, delimiter='\t')
 
         sc.settings.verbosity = 3  # verbosity: errors (0), warnings (1), info (2), hints (3)
         sc.settings.set_figure_params(dpi=100, facecolor='white')
@@ -116,6 +125,10 @@ class Fetcher:
 
         (adata.var.highly_variable == True).sum()
 
+        return adata
+
+    @staticmethod
+    def do_main(adata):
         sc.tl.pca(adata, n_comps=100)
         sc.pl.pca(adata)
 
@@ -133,6 +146,41 @@ class Fetcher:
 
         sc.tl.leiden(adata)
         sc.pl.umap(adata, color='leiden', palette='gist_ncar')
+
+
+class UiMiddleDialog(QtWidgets.QDialog):
+    def __init__(self):
+        super().__init__()
+        self.setObjectName("Dialog")
+        self.resize(383, 112)
+
+        self.buttonBox = QtWidgets.QDialogButtonBox(self)
+        self.buttonBox.setGeometry(QtCore.QRect(290, 20, 81, 241))
+        self.buttonBox.setOrientation(QtCore.Qt.Vertical)
+        self.buttonBox.setStandardButtons(QtWidgets.QDialogButtonBox.No | QtWidgets.QDialogButtonBox.Yes)
+        self.buttonBox.setCenterButtons(False)
+        self.buttonBox.setObjectName("buttonBox")
+
+        self.label = QtWidgets.QLabel(self)
+        self.label.setGeometry(QtCore.QRect(50, 20, 201, 16))
+        self.label.setObjectName("label")
+
+        self.retranslate_ui()
+        self.buttonBox.accepted.connect(self.on_accept)
+        self.buttonBox.rejected.connect(self.on_reject)
+        QtCore.QMetaObject.connectSlotsByName(self)
+
+    def retranslate_ui(self):
+        self.setWindowTitle("Dialog")
+        self.label.setText("Do you want to change anything?")
+
+    def on_accept(self):
+        print("Yes was pressed")
+        self.close()
+
+    def on_reject(self):
+        print("No was pressed")
+        self.close()
 
 
 if __name__ == "__main__":
