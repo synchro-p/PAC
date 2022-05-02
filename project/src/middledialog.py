@@ -1,3 +1,6 @@
+from PyQt5 import QtCore, QtWidgets
+
+
 class UiMiddleDialog(QtWidgets.QDialog):
     def __init__(self):
         super().__init__()
