@@ -1,5 +1,6 @@
 from distutils.log import error
 import scanpy as sc
+import pandas as pd
 
 class Back:
     @staticmethod
@@ -33,13 +34,15 @@ class Back:
 
     @staticmethod
     def do_main(adata):
-        sc.pl.pca_variance_ratio(adata, n_pcs=50, log=True)
-        sc.pl.pca_loadings(adata)
+        #sc.pl.pca_variance_ratio(adata, n_pcs=50, log=True)
+        #sc.pl.pca_loadings(adata)
 
         adata.var["total_expression"] = adata.X.sum(0)
         highest_expr = adata.var['total_expression'].nlargest(10)
 
         sc.tl.pca(adata, svd_solver='arpack')
+        sc.pl.pca_variance_ratio(adata, n_pcs=50, log=True)
+        sc.pl.pca_loadings(adata)
         sc.pl.pca(adata, color = highest_expr.index[0:3], components = ['1,2','3,4'], ncols = 2)
 
         sc.pl.pca(adata, color = highest_expr.index[0:3], ncols=3, hspace=20, wspace=0.2, projection='3d')
@@ -53,5 +56,5 @@ class Back:
 
         #экспорт номеров кластеров соотнесенных с каждым геном
         #возможно стоит сделать этот экспорт вместе с таблицей вклада гена в каждую компоненту
-        clusters_df = sc.pd.DataFrame(adata.obs["leiden"])
+        clusters_df = pd.DataFrame(adata.obs["leiden"])
         clusters_df.to_csv("clusters.csv")
