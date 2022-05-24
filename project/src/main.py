@@ -4,8 +4,7 @@ from PyQt5 import QtCore, QtWidgets
 from PyQt5.QtCore import pyqtSignal
 from PyQt5.QtWidgets import QFileDialog, QMainWindow
 
-from src.back import Back
-from src.middledialog import UiMiddleDialog
+from back import Back
 
 
 class UiMainWindow(QMainWindow):
@@ -93,10 +92,7 @@ class Fetcher:
         self.ui.show()
 
     def dostuff(self):
-        adata = Back.do_prep(self.ui.selectedfile())
-        window = UiMiddleDialog()
-        window.exec()
-        Back.do_main(adata)
+        Back.do_main(self.ui.selectedfile())
 
 
 if __name__ == "__main__":
