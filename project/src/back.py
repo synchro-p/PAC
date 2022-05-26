@@ -1,6 +1,5 @@
-from distutils.log import error
-import scanpy as sc
 import pandas as pd
+import scanpy as sc
 
 
 class Back:

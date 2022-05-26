@@ -68,35 +68,16 @@ class UiMainWindow(QMainWindow):
         self.close()
 
     def browse(self):
-        filedialog = QFileDialog()
-        filedialog.show()
-        if filedialog.exec_():
-            self.lineEdit.setText(filedialog.selectedFiles()[0])
+        self.lineEdit.setText(QFileDialog.getOpenFileName()[0])
 
     def proceed(self):
         self.select = self.lineEdit.text()
         self.close()
-        self.fetched.emit()
-
-    def selectedfile(self):
-        return self.select
-
-
-class Fetcher:
-    def __init__(self):
-        self.fetchedFile = 0
-        self.ui = UiMainWindow()
-        self.ui.fetched.connect(lambda: self.dostuff())
-
-    def getfilefromuser(self):
-        self.ui.show()
-
-    def dostuff(self):
-        Back.do_main(self.ui.selectedfile())
+        Back.do_main(self.select)
 
 
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
-    fetcher = Fetcher()
-    fetcher.getfilefromuser()
+    window = UiMainWindow()
+    window.show()
     sys.exit(app.exec_())
