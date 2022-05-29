@@ -4,7 +4,7 @@ from PyQt5 import QtCore, QtWidgets
 from PyQt5.QtCore import pyqtSignal
 from PyQt5.QtWidgets import QFileDialog, QMainWindow
 
-from back import Back
+from controller import Controller
 
 
 class UiMainWindow(QMainWindow):
@@ -55,7 +55,6 @@ class UiMainWindow(QMainWindow):
         self.setStatusBar(self.statusbar)
 
         self.initui()
-        QtCore.QMetaObject.connectSlotsByName(self)
 
     def initui(self):
         self.setWindowTitle("MainWindow")
@@ -73,7 +72,8 @@ class UiMainWindow(QMainWindow):
     def proceed(self):
         self.select = self.lineEdit.text()
         self.close()
-        Back.do_main(self.select)
+        controller = Controller()
+        controller.run_back(self.select)
 
 
 if __name__ == "__main__":
