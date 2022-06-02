@@ -12,13 +12,14 @@ class Back:
         #min_mean, max_mean, min_disp in highly_variable_genes
         #n_neighbors in neighbours
         #default: from_scratch(file, n, 500, 200, 0.0125, 3, 20)
-        path = '..\\saveddata\\' + str(n)
-        os.makedirs(path)
+        homepath = Path().absolute().resolve()
+        path_to_report = Path(str(homepath.parent) + '/saveddata/' + str(n))
+        os.makedirs(path_to_report)
 
         adata = sc.read(file)
         adata = adata.T
 
-        adata.write(Path(path + "\\adata_pre.h5ad"))
+        adata.write(Path(str(path_to_report) + "/adata_pre.h5ad"))
         # pdata = pd.read_csv(file, delimiter='\t')
 
         sc.settings.verbosity = 3  # verbosity: errors (0), warnings (1), info (2), hints (3)
@@ -35,7 +36,7 @@ class Back:
 
         sc.pp.highly_variable_genes(adata, min_mean=min_mean, max_mean=max_mean, min_disp=0.5)
 
-        adata.write(Path(path + "\\adata_mid.h5ad"))
+        adata.write(Path(str(path_to_report) + "/adata_mid.h5ad"))
 
         print("Highly variable genes: %d" % sum(adata.var.highly_variable))
         sc.pl.highly_variable_genes(adata)
@@ -65,22 +66,23 @@ class Back:
         # возможно стоит сделать этот экспорт вместе с таблицей вклада гена в каждую компоненту
         # clusters_df = pd.DataFrame(adata.obs["leiden"])
         # clusters_df.to_csv("clusters.csv")
-        adata.write(Path(path + "\\adata_post.h5ad"))
+        adata.write(Path(str(path_to_report) + "/adata_post.h5ad"))
         # adata1 = sc.read("anndata.h5ad")
 
     @staticmethod
     def from_saved(n):
-        adata = sc.read("..\\saveddata\\" + str(n) + "\\adata_pre.h5ad")
+        homepath = Path().absolute().resolve()
+        adata = sc.read(str(homepath.parent) + "/saveddata/" + str(n) + "/adata_pre.h5ad")
         sc.settings.verbosity = 3  # verbosity: errors (0), warnings (1), info (2), hints (3)
         sc.settings.set_figure_params(dpi=100, facecolor='white')
         sc.pl.highest_expr_genes(adata, n_top=15, log=True)
 
-        adata = sc.read("..\\saveddata\\" + str(n) + "\\adata_mid.h5ad")
+        adata = sc.read(str(homepath.parent) + "/saveddata/" + str(n) + "/adata_mid.h5ad")
 
         print("Highly variable genes: %d" % sum(adata.var.highly_variable))
         sc.pl.highly_variable_genes(adata)
 
-        adata = sc.read("..\\saveddata\\" + str(n) + "\\adata_post.h5ad")
+        adata = sc.read(str(homepath.parent) + "/saveddata/" + str(n) + "/adata_post.h5ad")
         highest_expr = adata.var['total_expression'].nlargest(10)
         sc.pl.pca_variance_ratio(adata, n_pcs=50, log=True)
         sc.pl.pca_loadings(adata)

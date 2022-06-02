@@ -1,12 +1,14 @@
 from os import path
 import pickle
+from pathlib import Path
 
 from back import Back
 
 
 class Controller(object):
     def __init__(self):
-        self.mappath = "..\\saveddata\\cacheinfo.pkl"
+        homepath = Path().absolute().resolve()
+        self.mappath = Path(str(homepath.parent) + "/saveddata/cacheinfo.pkl")
         self.back = Back()
 
     def map_exists(self):
@@ -15,7 +17,7 @@ class Controller(object):
     def run_back(self, file, min_genes_per_cell, min_cells_per_gene, min_mean, max_mean, n_neighbors):
         if self.map_exists():
             with open(self.mappath, 'rb') as handle:
-                save_dict = pickle.load(handle)
+                save_dict = dict(pickle.load(handle))
         else:
             save_dict = {}
 
