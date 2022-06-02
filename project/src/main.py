@@ -30,14 +30,14 @@ class UiMainWindow(QMainWindow):
         self.but_1.clicked.connect(self.browse)
 
         self.genes_per_cell_min = QtWidgets.QLineEdit(self.centralwidget)
-        self.genes_per_cell_min.setGeometry(QtCore.QRect(30, 120, 411, 22))
+        self.genes_per_cell_min.setGeometry(QtCore.QRect(30, 90, 411, 22))
         self.genes_per_cell_min.setObjectName("lineParameters1")
 
         self.but_2 = QtWidgets.QPushButton(self.centralwidget)
         self.but_2.setGeometry(QtCore.QRect(30, 180, 93, 28))
         self.but_2.setObjectName("pushButton_2")
         #------------------------v-link to backend-v--------------------------
-        self.but_2.clicked.connect(self.proceed(500, 200, 0.0125, 3, 20))
+        self.but_2.clicked.connect(self.proceed)
 
         self.but_3 = QtWidgets.QPushButton(self.centralwidget)
         self.but_3.setGeometry(QtCore.QRect(470, 180, 93, 28))
@@ -72,13 +72,14 @@ class UiMainWindow(QMainWindow):
         self.close()
 
     def browse(self):
-        self.lineEdit.setText(QFileDialog.getOpenFileName()[0])
+        str = QFileDialog.getOpenFileName()[0]
+        print(str)
+        self.lineEdit.setText(str)
 
-    def proceed(self, min_genes_per_cell, min_cells_per_gene, min_mean, max_mean, n_neighbors):
-        self.select = self.lineEdit.text()
+    def proceed(self):
         self.close()
         controller = Controller()
-        controller.run_back(self.select, min_genes_per_cell, min_cells_per_gene, min_mean, max_mean, n_neighbors)
+        controller.run_back(self.lineEdit.text(), int(self.genes_per_cell_min.text()), 200, 0.0125, 3, 20)
 
 
 if __name__ == "__main__":
