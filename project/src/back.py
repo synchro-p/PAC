@@ -6,7 +6,12 @@ from pathlib import Path
 class Back:
 
     @staticmethod
-    def from_scratch(file, n):
+    def from_scratch(file, n, min_genes_per_cell, min_cells_per_gene, min_mean, max_mean, n_neighbors):
+        #параметры:
+        #min_genes_per_cell, min_cells_per_gene in filter_cells and filter_genes
+        #min_mean, max_mean, min_disp in highly_variable_genes
+        #n_neighbors in neighbours
+        #default: from_scratch(file, n, 500, 200, 0.0125, 3, 20)
         path = '..\\saveddata\\' + str(n)
         os.makedirs(path)
 
@@ -21,14 +26,14 @@ class Back:
 
         sc.pl.highest_expr_genes(adata, n_top=15, log=True)
 
-        sc.pp.filter_cells(adata, min_genes=500)
-        sc.pp.filter_genes(adata, min_cells=200)
+        sc.pp.filter_cells(adata, min_genes=min_genes_per_cell)
+        sc.pp.filter_genes(adata, min_cells=min_cells_per_gene)
 
         sc.pp.normalize_total(adata, target_sum=1e4)
 
         sc.pp.log1p(adata)
 
-        sc.pp.highly_variable_genes(adata, min_mean=0.0125, max_mean=3, min_disp=0.5)
+        sc.pp.highly_variable_genes(adata, min_mean=min_mean, max_mean=max_mean, min_disp=0.5)
 
         adata.write(Path(path + "\\adata_mid.h5ad"))
 
@@ -49,7 +54,7 @@ class Back:
 
         sc.pl.pca(adata, color=highest_expr.index[0:3], ncols=3, hspace=20, wspace=0.2, projection='3d')
 
-        sc.pp.neighbors(adata, n_neighbors=20, n_pcs=40)
+        sc.pp.neighbors(adata, n_neighbors=n_neighbors, n_pcs=40)
 
         sc.tl.umap(adata)
 
